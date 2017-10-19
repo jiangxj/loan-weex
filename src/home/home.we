@@ -1,0 +1,194 @@
+<template>
+    <div class="home">
+        <div class="appTitle"><text style="color: #ffffff;">首页</text></div>
+        <list>
+            <refresh class="refresh-view" onrefresh="onrefresh">
+                <loading-indicator class="indicator"></loading-indicator>
+            </refresh>
+            <cell>
+                <slider auto-play="true" class="banner">
+                    <image repeat="{{banners}}" src="{{imgurl}}" class="banner"></image>
+                    <indicator class="dot"></indicator>
+                </slider>
+                <div class="prod-type-list">
+                    <div class="prod-type-list-item" repeat="{{type in types}}">
+                        <image src="{{type.imgurl}}" style="width: 140; height: 140"></image>
+                        <text style="margin-top: 10; color: #333333;">{{type.name}}</text>
+                    </div>
+                </div>
+                <div class="prod-list wrapper">
+                    <div class="title">
+                        <text style="font-size: 32;">热门推荐</text>
+                    </div>
+                    <a repeat="{{prod in prods}}" class="prod-list-item" href="http://m.soumoney.net/weex/loan/product/prod.js?pid={{prod.pid}}">
+                        <div class="prod-list-item-left">
+                            <image class="logo" src="{{prod.logo}}"></image>
+                        </div>
+                        <div class="prod-list-item-right">
+                            <div class="item-right-top">
+                                <text class="item-right-title">{{prod.title}}</text>
+                                <text class="item-right-tip">{{prod.num}}人已放款</text>
+                            </div>
+                            <text class="item-right-desc">{{prod.product_desc}}</text>
+                        </div>
+                    </a>
+                </div>
+            </cell>
+        </list>
+    </div>
+</template>
+
+<script>
+    var stream = require('@weex-module/stream');
+    var modal = weex.requireModule('modal');
+    var navigator = weex.requireModule('navigator');
+    module.exports = {
+        data:{
+            banners: [],
+            types: [{
+                name: '小额极速贷',
+                imgurl: 'http://m.soumoney.net/images/icons/xiaoedai@2x.png'
+            },{
+                name: '大额借款',
+                imgurl: 'http://m.soumoney.net/images/icons/daedai@2x.png'
+            },{
+                name: '工薪贷',
+                imgurl: 'http://m.soumoney.net/images/icons/gongxindai@2x.png'
+            },{
+                name: '身份证贷',
+                imgurl: 'http://m.soumoney.net/images/icons/shenfenzhendai@2x.png'
+            }],
+            prods: []
+        },
+        methods:{
+            onrefresh: function (e) {
+                this.reload();
+            },
+            jumpPage: function(url){
+                modal.toast({ message: 'go...', duration: 0.3 });
+                navigator.push({
+                    url: url,
+                    animated: "true"
+                });
+            },
+            reload: function(){
+                var self = this;
+                stream.fetch({
+                    method: 'GET',
+                    url: "http://m.soumoney.net/loan/product/banners.do",
+                    type:'json'
+                }, function(response) {
+                    if(response.data.statusCode == 0){
+                        self.banners = response.data.datalist;
+                    }
+                });
+
+                stream.fetch({
+                    method: 'GET',
+                    url: "http://m.soumoney.net/loan/product/recommend.do",
+                    type:'json'
+                }, function(response) {
+                    if(response.data.statusCode == 0){
+                        self.prods = response.data.datalist;
+                    }
+                });
+            }
+        },
+        created: function(){
+            this.reload();
+        }
+    }
+</script>
+
+<style scoped>
+    .appTitle{
+        width: 750;
+        height: 88;
+        background-color: #17191d;
+        justify-content: center;
+        align-items: center;
+        color: #ffffff;
+        font-size: 32;
+    }
+    .title{
+        padding-left: 32;
+        border-left-width: 8;
+        border-left-color: #108ee9;
+        margin-top: 30;
+        margin-bottom: 30;
+    }
+    .wrapper{
+        padding-left: 32;
+        padding-right: 32;
+    }
+    .home{
+        background-color: #f9f9f9;
+    }
+    .banner{
+        width: 750;
+        height: 350;
+    }
+    .logo{
+        width: 100;
+        height:100;
+    }
+    .dot{
+        top: 180;
+        text-align: center;
+    }
+    .prod-type-list{
+        margin-top: 20;
+        flex-direction: row;
+        padding-left: 32;
+        padding-right: 32;
+        background-color: #ffffff;
+    }
+    .prod-type-list-item{
+        flex: 1;
+        padding-top: 20;
+        padding-bottom: 20;
+        flex-direction: column;
+        justify-content: flex-end;
+        align-items: center;
+    }
+    .prod-list{
+        margin-top: 29;
+        background-color: #fff;
+    }
+    .prod-list-item{
+        padding-left: 32;
+        padding-right: 32;
+        padding-top: 32;
+        padding-bottom: 32;
+        flex-direction: row;
+        border-bottom-width: 2;
+        border-bottom-color: #eeeeee;
+        background-color: #ffffff;
+    }
+    .prod-list-item-left{
+        width: 100;
+    }
+    .prod-list-item-right{
+        flex-direction: column;
+        margin-left: 20;
+        width: 586;
+    }
+    .item-right-title{
+        font-size: 32;
+        color: #333333;
+        flex: 1;
+    }
+    .item-right-desc{
+        margin-top: 30;
+        font-size: 28;
+        color: #666666;
+    }
+    .item-right-top{
+        flex-direction: row;
+    }
+    .item-right-tip{
+        font-size: 24;
+        flex: 1;
+        text-align: right;
+    }
+</style>

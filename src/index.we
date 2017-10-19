@@ -1,0 +1,63 @@
+<template>
+  <div style="flex-direction: column;">
+    <wxc-tabbar tab-items={{tabItems}}></wxc-tabbar>
+  </div>
+</template>
+
+<script>
+  require('weex-components');
+  module.exports = {
+    data: {
+      tabItems:[
+        {
+          index:0,
+          title:"首页",
+          titleColor:'#b8b8b8',
+          unselectedColor: '#b8b8b8',
+          selectedColor:'#108ee9',
+          icon:"",
+          image:"http://m.soumoney.net/images/icons/home_nor@2x.png",
+          selectedImage:"http://m.soumoney.net/images/icons/home_select@2x.png",
+          src:"http://m.soumoney.net/weex/loan/home/home.js",
+          visibility:"visible"
+        },
+        {
+          index:1,
+          title:"找贷款",
+          titleColor:'#108ee9',
+          icon:"",
+          image:"http://m.soumoney.net/images/icons/zhaodaikuan_nor@2x.png",
+          selectedImage:"http://m.soumoney.net/images/icons/zhaodaikuan_select@2x.png",
+          src:"http://m.soumoney.net/weex/loan/loan/loan.js",
+          visibility:"hidden"
+        },
+        {
+          index:2,
+          title:"信用卡",
+          titleColor:'#108ee9',
+          icon:"",
+          image:"http://m.soumoney.net/images/icons/xinyongka_nor@2x.png",
+          selectedImage:"http://m.soumoney.net/images/icons/xinyongka_select@2x.png",
+          src:"http://m.soumoney.net/weex/loan/card/card.js",
+          visibility:"hidden"
+        },
+        {
+          index:3,
+          title:"我的",
+          titleColor:'#108ee9',
+          icon:"",
+          image:"http://m.soumoney.net/images/icons/my_nor@2x.png",
+          selectedImage:"http://m.soumoney.net/images/icons/my_select@2x.png",
+          src:"http://m.soumoney.net/weex/loan/user/user.js",
+          visibility:"hidden"
+        }
+
+      ]
+    },
+    methods: {}
+  }
+</script>
+
+<style>
+
+</style>

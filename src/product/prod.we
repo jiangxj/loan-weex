@@ -1,0 +1,198 @@
+<template>
+    <div class="product">
+        <div class="appTitle"><text style="color: #ffffff;">{{prod.title}}</text></div>
+        <div class="header wrapper">
+            <div class="top" style="flex-direction: row; height: 174; align-items: center;">
+                <div class="logo" style="margin-right: 32;">
+                    <image style="width: 100; height: 100;" src="{{prod.logo}}"></image>
+                </div>
+                <div class="content" style="flex-direction: column;">
+                    <div style="flex-direction: row; align-items: center; margin-bottom: 28;">
+                        <text style="margin-right: 28; font-size: 32;">成功率</text>
+                        <div style="flex-direction: row; flex: 1; margin-right: 28;"><image class="star" repeat="{{v in star}}" src="{{v}}"></image><image class="star" repeat="{{v in unstar}}" src="{{v}}"></image></div>
+                        <text style="flex: 1;" class="f24 fc666666">{{prod.num}}人已放款</text>
+                    </div>
+                    <div style="align-items: center; justify-content: flex-start;">
+                        <text class="f24">{{prod.feature}}</text>
+                    </div>
+                </div>
+            </div>
+            <div class="bottom wrapper" style="height: 86; align-items: center;">
+                <div style="flex: 4; flex-direction: row; align-items: center;">
+                    <text class="f24 fc666666" if="{{prod.rate_type == 0}}">日</text>
+                    <text class="f24 fc666666" if="{{prod.rate_type == 1}}">月</text>
+                    <text class="f24 fc666666" if="{{prod.rate_type == 2}}">年</text>
+
+                    <text class="f24 fc666666">利率</text>
+                    <text class="f24 fc666666">{{prod.rate}}%</text>
+                </div>
+                <div style="flex: 1"><text class="f28 fc666666">|</text></div>
+                <div style="flex: 4;">
+                    <text class="f24 fc666666">贷款期限{{prod.duration}}</text>
+                </div>
+            </div>
+        </div>
+        <div class="statement wrapper">
+            <div class="title">
+                <text style="font-size: 32;">产品介绍</text>
+            </div>
+            <text class="f28">{{prod.product_desc}}</text>
+        </div>
+
+        <div class="conditions wrapper">
+            <div class="title">
+                <text style="font-size: 32;">申请条件</text>
+            </div>
+            <text class="f28">{{prod.conditions}}</text>
+        </div>
+
+        <div class="material wrapper">
+            <div class="title">
+                <text style="font-size: 32;">所需材料</text>
+            </div>
+            <text class="f28">{{prod.material}}</text>
+        </div>
+
+        <div class="footer">
+            <div onclick="collect" style="flex: 1; align-items: center; justify-content: center; height: 98;">
+                <image if="{{isCollect == false}}" style="width: 46; height: 46;" src="http://m.soumoney.net/images/icons/icon_like_nor@2x.png"></image>
+                <image if="{{isCollect == true}}" style="width: 46; height: 46;" src="http://m.soumoney.net/images/icons/icon_like_select@2x.png"></image>
+            </div>
+            <div onclick="apply" style="flex: 4; background-color: #108ee9; align-items: center; justify-content: center; height: 98;">
+                <text style="font-size: 32; color: #fff;">立即申请</text>
+            </div>
+        </div>
+    </div>
+</template>
+
+<script>
+    var stream = require('@weex-module/stream');
+    var modal = weex.requireModule('modal');
+    var navigator = weex.requireModule('navigator');
+    module.exports = {
+        data: {
+            prod:{},
+            star: [],
+            unstar:[],
+            isCollect: false
+        },
+        methods: {
+            collect: function () {
+                modal.toast({message: '收藏成功'});
+                this.isCollect = !this.isCollect;
+            },
+            apply: function () {
+                var self = this;
+                navigator.push({
+                    url: 'http://m.soumoney.net/weex/loan/webview.js?title='+self.prod.title+'&url='+self.prod.url,
+                    animated: "true"
+                })
+            },
+            queryString: function (name) {
+                var url = this.$getConfig().bundleUrl;
+                if(url.indexOf("?")<0){
+                    return ""
+                }
+                var paramStr = url.substr(url.indexOf("?")+1);
+                var kvs = paramStr.split("&");
+                var req = {};
+                for(var i=0; i<kvs.length; i++){
+                    var nvs = kvs[i].split("=");
+                    if(nvs[0] == name && nvs.length == 2){
+                        return nvs[1];
+                    }
+                }
+                return "";
+            }
+        },
+        created: function(){
+            var self = this;
+            stream.fetch({
+                method: 'GET',
+                url: "http://m.soumoney.net/loan/product/detail.do?pid="+self.queryString("pid"),
+                type:'json'
+            }, function(response) {
+                if(response.data.statusCode == 0){
+                    self.prod = response.data.prod;
+                    for(var i=0;i<self.prod.star; i++){
+                       self.star.push("http://m.soumoney.net/images/icons/icon_star_full@2x.png");
+                    }
+                    for(var i=0;i<5-self.prod.star; i++){
+                        self.unstar.push("http://m.soumoney.net/images/icons/icon_star_empty@2x.png");
+                    }
+                }
+            });
+        }
+    }
+</script>
+
+<style scoped>
+    .appTitle{
+        width: 750;
+        height: 88;
+        background-color: #17191d;
+        justify-content: center;
+        align-items: center;
+        color: #ffffff;
+        font-size: 32;
+    }
+    .wrapper{
+        padding-left: 32;
+        padding-right: 32;
+    }
+    .product{
+        background-color: #f9f9f9;
+    }
+    .header{
+        background-color: #fff;
+        margin-bottom: 20;
+    }
+    .statement, .conditions, .material{
+        background-color: #fff;
+        margin-bottom: 20;
+        padding-top: 30;
+        padding-bottom: 30;
+    }
+    .bottom{
+        flex-direction: row;
+        align-items: center;
+        border-top-width: 2;
+        border-top-color: #eeeeee;
+        height: 84;
+        justify-content: center;
+    }
+    .f24{
+        font-size: 24;
+    }
+    .f28{
+        font-size: 28;
+    }
+    .fc666666{
+        color: #666666;
+    }
+    .star{
+        width: 26;
+        height: 26;
+        margin-left: 5;
+        margin-right: 5;
+    }
+    .title{
+        padding-left: 32;
+        border-left-width: 8;
+        border-left-color: #108ee9;
+        margin-top: 30;
+        margin-bottom: 30;
+    }
+    .footer{
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        flex-direction: row;
+        width: 750;
+        height: 98;
+        align-items: center;
+        justify-content: center;
+        border-top-width: 2;
+        border-top-color: #eeeeee;
+    }
+</style>

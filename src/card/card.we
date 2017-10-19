@@ -1,0 +1,94 @@
+<template>
+    <div class="card">
+        <div class="appTitle"><text style="color: #ffffff;">信用卡</text></div>
+        <list>
+            <refresh class="refresh-view" onrefresh="onrefresh">
+                <loading-indicator class="indicator"></loading-indicator>
+            </refresh>
+            <cell>
+                <image style="width: 750; height: 350" src="https://m.soumoney.net/images/b1.png"></image>
+            </cell>
+            <cell>
+                <div class="list">
+                    <a class="list-item"  repeat="{{card in cards}}" href="http://m.soumoney.net/weex/loan/webview.js?title={{card.title}}&url={{card.url}}">
+                        <div class="logo">
+                            <image style="width: 100; height: 100;" src="{{card.imgurl}}"></image>
+                        </div>
+                        <div class="content">
+                            <div style="margin-bottom: 32"><text style="font-size: 32; color: #333333">{{card.title}}</text></div>
+                            <div><text style="font-size: 28; color: #666666">{{card.statement}}</text></div>
+                        </div>
+                    </a>
+                </div>
+            </cell>
+        </list>
+    </div>
+</template>
+
+<style scoped>
+    .card{
+        background-color: #f9f9f9;
+    }
+    .appTitle{
+        width: 750;
+        height: 88;
+        background-color: #17191d;
+        justify-content: center;
+        align-items: center;
+        color: #ffffff;
+        font-size: 32;
+    }
+    .list{
+        padding-left: 32px;
+    }
+    .list-item{
+        flex-direction: row;
+        border-bottom-width: 2;
+        border-bottom-color: #eeeeee;
+        border-bottom-style: solid;
+        padding-top: 42;
+        padding-bottom: 42;
+    }
+    .logo{
+        flex: 1;
+        justify-content: center;
+    }
+    .content{
+        flex: 5;
+        flex-direction: column;
+        justify-content: center;
+    }
+</style>
+
+<script>
+    const webview = weex.requireModule('webview')
+    var stream = require('@weex-module/stream');
+    var modal = weex.requireModule('modal');
+    var navigator = weex.requireModule('navigator');
+    module.exports = {
+        data: {
+            cards: []
+        },
+        methods: {
+            onrefresh: function (e) {
+                this.load();
+            },
+            load: function () {
+                var self = this;
+                stream.fetch({
+                    method: 'GET',
+                    url: "http://m.soumoney.net/loan/card/hotlist.do",
+                    type:'json'
+                }, function(response) {
+                    if(response.data.statusCode == 0){
+                        self.cards = response.data.datalist;
+                    }
+                });
+
+            }
+        },
+        created: function () {
+            this.load();
+        }
+    }
+</script>

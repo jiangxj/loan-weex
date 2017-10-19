@@ -1,0 +1,68 @@
+<template>
+    <div>
+        <div class="appTitle" style="flex-direction: row;">
+            <div style="flex: 1; align-items: center;" onclick="close"><text style="font-size: 32; color: #fff; padding-left: 10;">关闭</text></div>
+            <div style="flex: 9; align-items: center; margin-left: -85; justify-content: center;">
+                <text style="color: #ffffff;">{{title}}</text>
+            </div>
+        </div>
+        <web id="webview" src="{{url}}" class="webview" onpagestart="start" onpagefinish="finish" onerror="error"></web>
+    </div>
+</template>
+<script>
+    const webview = weex.requireModule('webview');
+    const modal = weex.requireModule('modal');
+    var navigator = weex.requireModule('navigator');
+    export default {
+        data: {
+            url : '',
+            title: ''
+        },
+        methods: {
+            start (event) {
+            },
+            finish (event) {
+
+            },
+            error (event) {
+            },
+            close: function (event) {
+                navigator.pop();
+            },
+            queryString: function (name) {
+                var url = this.$getConfig().bundleUrl;
+                if(url.indexOf("?")<0){
+                    return ""
+                }
+                var paramStr = url.substr(url.indexOf("?")+1);
+                var kvs = paramStr.split("&");
+                var req = {};
+                for(var i=0; i<kvs.length; i++){
+                    var nvs = kvs[i].split("=");
+                    if(nvs[0] == name && nvs.length == 2){
+                        return nvs[1];
+                    }
+                }
+                return "";
+            }
+        },
+        created: function () {
+            this.url = this.queryString("url");
+            this.title = this.queryString("title");
+        }
+    }
+</script>
+<style scoped>
+    .appTitle{
+        width: 750;
+        height: 88;
+        background-color: #17191d;
+        justify-content: center;
+        align-items: center;
+        color: #ffffff;
+        font-size: 32;
+    }
+    .webview {
+        flex: 1;
+    }
+</style>
